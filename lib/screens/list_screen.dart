@@ -1,14 +1,17 @@
 // =========================================================================
-// [RESPONSI CHECKPOINT 4: HALAMAN LIST & FITUR FILTER]
-// File ini menampilkan daftar item dari API dan Filter Chip horizontal.
-// JIKA STUDI KASUS BERUBAH:
-// 1. Pada _fetchData(): tentukan atribut apa yang dijadikan filter (author, category, clan, brand).
-// 2. Pada FilterChip: sesuaikan logika filter item[field] == selectedFilter.
-// 3. Pada ListView item card: sesuaikan gambar thumbnail (errorBuilder), judul, dan subtitle info.
+// [SIMULASI MODUL 5: HALAMAN LIST PRODUK & FILTER CHIP]
+// SEBELUMNYA: Menampilkan artikel luar angkasa & filter berdasarkan author.
+// SEKARANG: Menampilkan produk & filter berdasarkan brand (merek produk).
+//
+// PERUBAHAN YANG DILAKUKAN:
+// 1. Menggunakan ProductModel alih-alih ArticleModel.
+// 2. Mengambil atribut item.brand untuk dijadikan opsi FilterChip.
+// 3. Menampilkan harga dan brand pada subtitle Card item.
+// 4. Exception handling gambar tetap dipertahankan dengan errorBuilder.
 // =========================================================================
 
 import 'package:flutter/material.dart';
-import '../models/article_model.dart';
+import '../models/product_model.dart';
 import '../services/api_service.dart';
 import 'detail_screen.dart';
 import 'favorite_screen.dart';
@@ -28,7 +31,7 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  List<ArticleModel> _allArticles = [];
+  List<ProductModel> _allProducts = [];
   List<String> _filters = [];
   String _selectedFilter = 'All';
   bool _isLoading = true;
@@ -40,7 +43,7 @@ class _ListScreenState extends State<ListScreen> {
     _fetchData();
   }
 
-  // Mengambil data dari API berdasarkan endpoint (Modul 5)
+  // Mengambil data produk dari API DummyJSON (Modul 5)
   Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
@@ -48,20 +51,19 @@ class _ListScreenState extends State<ListScreen> {
     });
 
     try {
-      final data = await ApiService.getArticles(widget.endpoint);
+      final data = await ApiService.getProducts(widget.endpoint);
 
-      // [RESPONSI]: Ekstraksi data unik untuk Filter Chip.
-      // Bisa diganti e.category, e.brand, e.clan, dsb sesuai soal baru.
-      final Set<String> filterSet = {};
+      // [PERUBAHAN]: Ekstraksi brand unik untuk dijadikan FilterChip
+      final Set<String> brandSet = {};
       for (final item in data) {
-        if (item.author.trim().isNotEmpty) {
-          filterSet.add(item.author.trim());
+        if (item.brand.trim().isNotEmpty) {
+          brandSet.add(item.brand.trim());
         }
       }
 
       setState(() {
-        _allArticles = data;
-        _filters = ['All', ...filterSet];
+        _allProducts = data;
+        _filters = ['All', ...brandSet];
         _isLoading = false;
       });
     } catch (e) {
@@ -74,10 +76,10 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // [RESPONSI]: Logika penyaringan data berdasarkan Chip yang aktif
-    final displayedArticles = _selectedFilter == 'All'
-        ? _allArticles
-        : _allArticles.where((item) => item.author == _selectedFilter).toList();
+    // [PERUBAHAN]: Logika filter produk berdasarkan Brand yang dipilih
+    final displayedProducts = _selectedFilter == 'All'
+        ? _allProducts
+        : _allProducts.where((item) => item.brand == _selectedFilter).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
@@ -93,7 +95,7 @@ class _ListScreenState extends State<ListScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // Tombol menuju halaman Favourite (Modul 4 & Modul 6)
+          // Tombol menuju Halaman Favorite (Modul 4 & 6)
           IconButton(
             tooltip: 'Halaman Favourite',
             icon: const Icon(Icons.favorite, color: Colors.white),
@@ -110,7 +112,7 @@ class _ListScreenState extends State<ListScreen> {
       ),
       body: Column(
         children: [
-          // [RESPONSI]: Baris Horizontal Filter Chip
+          // Baris horizontal FilterChip berdasarkan Brand
           if (!_isLoading && _filters.isNotEmpty)
             Container(
               color: Colors.white,
@@ -161,7 +163,7 @@ class _ListScreenState extends State<ListScreen> {
             ),
           const Divider(height: 1, thickness: 1),
 
-          // [RESPONSI]: Tampilan List Data Dinamis (Modul 2 & 5)
+          // Tampilan List Data Dinamis Produk
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -193,10 +195,10 @@ class _ListScreenState extends State<ListScreen> {
                           ],
                         ),
                       )
-                    : displayedArticles.isEmpty
+                    : displayedProducts.isEmpty
                         ? Center(
                             child: Text(
-                              'Tidak ada data untuk filter "$_selectedFilter"',
+                              'Tidak ada produk untuk brand "$_selectedFilter"',
                               style: const TextStyle(color: Colors.grey),
                             ),
                           )
@@ -205,9 +207,9 @@ class _ListScreenState extends State<ListScreen> {
                               horizontal: 16,
                               vertical: 12,
                             ),
-                            itemCount: displayedArticles.length,
+                            itemCount: displayedProducts.length,
                             itemBuilder: (context, index) {
-                              final item = displayedArticles[index];
+                              final product = displayedProducts[index];
                               return Card(
                                 elevation: 1.5,
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -222,8 +224,7 @@ class _ListScreenState extends State<ListScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => DetailScreen(
-                                          item: item,
-                                          endpoint: widget.endpoint,
+                                          product: product,
                                         ),
                                       ),
                                     );
@@ -232,20 +233,18 @@ class _ListScreenState extends State<ListScreen> {
                                     padding: const EdgeInsets.all(12.0),
                                     child: Row(
                                       children: [
-                                        // [RESPONSI]: Leading Thumbnail & Exception Handling Gambar
+                                        // Leading Thumbnail dengan Exception Handling (errorBuilder)
                                         ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(8),
                                           child: Image.network(
-                                            item.imageUrl,
+                                            product.imageUrl,
                                             width: 85,
                                             height: 65,
                                             fit: BoxFit.cover,
                                             loadingBuilder:
                                                 (context, child, progress) {
-                                              if (progress == null) {
-                                                return child;
-                                              }
+                                              if (progress == null) return child;
                                               return Container(
                                                 width: 85,
                                                 height: 65,
@@ -264,7 +263,6 @@ class _ListScreenState extends State<ListScreen> {
                                             },
                                             errorBuilder:
                                                 (context, error, stackTrace) {
-                                              // Tampilan fallback jika URL gambar gagal/rusak
                                               return Container(
                                                 width: 85,
                                                 height: 65,
@@ -280,14 +278,14 @@ class _ListScreenState extends State<ListScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 14),
-                                        // [RESPONSI]: Judul dan Informasi Tambahan
+                                        // Judul & Harga / Brand Produk
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                item.title,
+                                                product.title,
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
@@ -297,12 +295,25 @@ class _ListScreenState extends State<ListScreen> {
                                                 ),
                                               ),
                                               const SizedBox(height: 6),
-                                              Text(
-                                                item.author,
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey.shade600,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    '\$${product.price}',
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Color(0xFF4C6EF5),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    '•  ${product.brand}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey.shade600,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),

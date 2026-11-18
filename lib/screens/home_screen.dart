@@ -1,10 +1,12 @@
 // =========================================================================
-// [RESPONSI CHECKPOINT 3: HALAMAN UTAMA / MENU PILIHAN]
-// File ini menampilkan dashboard menu utama dan tombol Logout.
-// JIKA STUDI KASUS BERUBAH:
-// 1. Sesuaikan nama-nama menu (judul, deskripsi, icon) pada _buildMenuCard.
-// 2. Sesuaikan endpoint yang dikirimkan ke ListScreen (misal: 'characters', 'episodes', 'products', dsb).
-// 3. Tombol Logout sudah baku (SharedPreferences clear session).
+// [SIMULASI MODUL 5: HALAMAN UTAMA PRODUK]
+// SEBELUMNYA: 3 Menu Berita Luar Angkasa (News, Blog, Reports)
+// SEKARANG: 3 Menu Katalog E-Commerce DummyJSON (All Products, Beauty, Fragrances)
+//
+// PERUBAHAN YANG DILAKUKAN:
+// 1. Ganti judul dan deskripsi menu menjadi kategori produk.
+// 2. Ganti string parameter endpoint yang dikirimkan ke ListScreen.
+// 3. Tombol Logout dan sapaan pengguna tetap utuh sesuai standar responsi.
 // =========================================================================
 
 import 'package:flutter/material.dart';
@@ -101,7 +103,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
       appBar: AppBar(
-        // [RESPONSI]: Menampilkan username login dinamis sesuai ketentuan Modul 4
+        // Menampilkan username login secara dinamis
         title: Text(
           'Hai, $username!',
           style: const TextStyle(
@@ -122,60 +124,60 @@ class HomeScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    // [RESPONSI]: Menu 1 - Sesuaikan title, deskripsi, dan endpoint API
+                    // [PERUBAHAN 1]: Menu Semua Produk
                     _buildMenuCard(
                       context: context,
-                      icon: Icons.newspaper_outlined,
-                      title: 'News',
+                      icon: Icons.storefront_outlined,
+                      title: 'All Products',
                       subtitle:
-                          'Get an overview of the latest SpaceFlight news, from various sources! Easily link your users to the right websites.',
+                          'Jelajahi seluruh katalog produk yang tersedia di DummyJSON Store.',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
-                              menuTitle: 'News',
-                              endpoint: 'articles', // <-- Ganti endpoint di sini
+                              menuTitle: 'All Products',
+                              endpoint: 'products', // Endpoint API Semua Produk
                             ),
                           ),
                         );
                       },
                     ),
 
-                    // [RESPONSI]: Menu 2 - Sesuaikan title, deskripsi, dan endpoint API
+                    // [PERUBAHAN 2]: Menu Kategori Beauty
                     _buildMenuCard(
                       context: context,
-                      icon: Icons.menu_book_outlined,
-                      title: 'Blog',
+                      icon: Icons.face_retouching_natural_outlined,
+                      title: 'Beauty & Skincare',
                       subtitle:
-                          'Blogs often provide a more detailed overview of launches and missions. A must-have for the serious spaceflight enthusiast.',
+                          'Temukan berbagai produk kecantikan, kosmetik, dan perawatan kulit terbaik.',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
-                              menuTitle: 'Blog',
-                              endpoint: 'blogs', // <-- Ganti endpoint di sini
+                              menuTitle: 'Beauty Products',
+                              endpoint: 'products/category/beauty', // Endpoint Kategori Beauty
                             ),
                           ),
                         );
                       },
                     ),
 
-                    // [RESPONSI]: Menu 3 - Sesuaikan title, deskripsi, dan endpoint API
+                    // [PERUBAHAN 3]: Menu Kategori Fragrances
                     _buildMenuCard(
                       context: context,
-                      icon: Icons.analytics_outlined,
-                      title: 'Reports',
+                      icon: Icons.air_outlined,
+                      title: 'Fragrances',
                       subtitle:
-                          'Space stations and other missions often publish their data. With SNAPI, you can include it in your app.',
+                          'Koleksi parfum dan wewangian premium pilihan dari berbagai merek terkenal.',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
-                              menuTitle: 'Reports',
-                              endpoint: 'reports', // <-- Ganti endpoint di sini
+                              menuTitle: 'Fragrances',
+                              endpoint: 'products/category/fragrances', // Endpoint Kategori Parfum
                             ),
                           ),
                         );
@@ -185,7 +187,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // [RESPONSI]: Tombol Logout di bawah pilihan menu (Wajib ada)
+              // Tombol Logout berwarna merah di bagian bawah
               SizedBox(
                 width: 140,
                 height: 42,

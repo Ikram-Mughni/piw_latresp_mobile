@@ -1,6 +1,17 @@
+// =========================================================================
+// [SIMULASI MODUL 5: HALAMAN FAVORITE PRODUK]
+// Menerapkan Hive database & ValueListenableBuilder (Modul 6).
+// SEBELUMNYA: Menyimpan dan menampilkan ArticleModel favorit.
+// SEKARANG: Menyimpan dan menampilkan ProductModel favorit.
+//
+// CATATAN:
+// Logika reaktivitas ValueListenableBuilder TIDAK BERUBAH sama sekali!
+// Yang disesuaikan hanya mapping ke ProductModel dan tampilan harga/brand.
+// =========================================================================
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/article_model.dart';
+import '../models/product_model.dart';
 import 'detail_screen.dart';
 
 class FavoriteScreen extends StatelessWidget {
@@ -14,7 +25,7 @@ class FavoriteScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF7F8FC),
       appBar: AppBar(
         title: const Text(
-          'Favorite',
+          'Favorite Produk',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: const Color(0xFF4C6EF5),
@@ -37,7 +48,7 @@ class FavoriteScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Belum ada data favourite',
+                    'Belum ada produk favourite',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey.shade600,
@@ -49,17 +60,17 @@ class FavoriteScreen extends StatelessWidget {
             );
           }
 
-          // Mengonversi data map di Hive kembali ke objek ArticleModel
-          final List<ArticleModel> favoriteList = box.values.map((val) {
+          // [PERUBAHAN]: Mengonversi data map di Hive kembali ke objek ProductModel
+          final List<ProductModel> favoriteList = box.values.map((val) {
             final map = Map<String, dynamic>.from(val as Map);
-            return ArticleModel.fromJson(map);
+            return ProductModel.fromJson(map);
           }).toList();
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             itemCount: favoriteList.length,
             itemBuilder: (context, index) {
-              final item = favoriteList[index];
+              final product = favoriteList[index];
               return Card(
                 elevation: 1.5,
                 margin: const EdgeInsets.only(bottom: 12),
@@ -74,8 +85,7 @@ class FavoriteScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => DetailScreen(
-                          item: item,
-                          endpoint: item.type,
+                          product: product,
                         ),
                       ),
                     );
@@ -88,7 +98,7 @@ class FavoriteScreen extends StatelessWidget {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            item.imageUrl,
+                            product.imageUrl,
                             width: 80,
                             height: 60,
                             fit: BoxFit.cover,
@@ -122,13 +132,13 @@ class FavoriteScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 14),
-                        // Judul & Author
+                        // Judul & Harga Produk
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                item.title,
+                                product.title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -138,12 +148,25 @@ class FavoriteScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                item.author,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '\$${product.price}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF4C6EF5),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '•  ${product.brand}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -153,7 +176,7 @@ class FavoriteScreen extends StatelessWidget {
                           tooltip: 'Hapus dari Favourite',
                           icon: const Icon(Icons.favorite, color: Colors.red),
                           onPressed: () async {
-                            await box.delete(item.id.toString());
+                            await box.delete(product.id.toString());
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
