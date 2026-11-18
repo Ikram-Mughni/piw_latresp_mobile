@@ -1,3 +1,12 @@
+// =========================================================================
+// [RESPONSI CHECKPOINT 3: HALAMAN UTAMA / MENU PILIHAN]
+// File ini menampilkan dashboard menu utama dan tombol Logout.
+// JIKA STUDI KASUS BERUBAH:
+// 1. Sesuaikan nama-nama menu (judul, deskripsi, icon) pada _buildMenuCard.
+// 2. Sesuaikan endpoint yang dikirimkan ke ListScreen (misal: 'characters', 'episodes', 'products', dsb).
+// 3. Tombol Logout sudah baku (SharedPreferences clear session).
+// =========================================================================
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'list_screen.dart';
@@ -92,6 +101,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
       appBar: AppBar(
+        // [RESPONSI]: Menampilkan username login dinamis sesuai ketentuan Modul 4
         title: Text(
           'Hai, $username!',
           style: const TextStyle(
@@ -112,6 +122,7 @@ class HomeScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
+                    // [RESPONSI]: Menu 1 - Sesuaikan title, deskripsi, dan endpoint API
                     _buildMenuCard(
                       context: context,
                       icon: Icons.newspaper_outlined,
@@ -124,12 +135,14 @@ class HomeScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
                               menuTitle: 'News',
-                              endpoint: 'articles',
+                              endpoint: 'articles', // <-- Ganti endpoint di sini
                             ),
                           ),
                         );
                       },
                     ),
+
+                    // [RESPONSI]: Menu 2 - Sesuaikan title, deskripsi, dan endpoint API
                     _buildMenuCard(
                       context: context,
                       icon: Icons.menu_book_outlined,
@@ -142,12 +155,14 @@ class HomeScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
                               menuTitle: 'Blog',
-                              endpoint: 'blogs',
+                              endpoint: 'blogs', // <-- Ganti endpoint di sini
                             ),
                           ),
                         );
                       },
                     ),
+
+                    // [RESPONSI]: Menu 3 - Sesuaikan title, deskripsi, dan endpoint API
                     _buildMenuCard(
                       context: context,
                       icon: Icons.analytics_outlined,
@@ -160,7 +175,7 @@ class HomeScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => const ListScreen(
                               menuTitle: 'Reports',
-                              endpoint: 'reports',
+                              endpoint: 'reports', // <-- Ganti endpoint di sini
                             ),
                           ),
                         );
@@ -170,7 +185,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // Tombol Logout di bawah pilihan yang tersedia
+              // [RESPONSI]: Tombol Logout di bawah pilihan menu (Wajib ada)
               SizedBox(
                 width: 140,
                 height: 42,

@@ -1,3 +1,12 @@
+// =========================================================================
+// [RESPONSI CHECKPOINT 5: HALAMAN DETAIL, LAUNCH URL & FAVORITE]
+// File ini menampilkan informasi lengkap dari data yang dipilih.
+// JIKA STUDI KASUS BERUBAH:
+// 1. Sesuaikan field-field yang ditampilkan (gambar banner, judul, atribut spesifik, tanggal, harga, rating, dsb).
+// 2. Tombol Favorite dan sinkronisasi ke Hive sudah otomatis bekerja untuk semua tipe data.
+// 3. Tombol Buka Web / Launch URL sudah menggunakan url_launcher.
+// =========================================================================
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,7 +37,7 @@ class _DetailScreenState extends State<DetailScreen> {
     _checkFavoriteStatus();
   }
 
-  // Cek apakah data ini sudah ada di dalam Hive favorite box
+  // Cek apakah data ini sudah ada di dalam Hive favorite box (Modul 6)
   void _checkFavoriteStatus() {
     setState(() {
       _isFavorite = _favoriteBox.containsKey(widget.item.id.toString());
@@ -127,6 +136,7 @@ class _DetailScreenState extends State<DetailScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
+          // [RESPONSI]: Tombol Aksi Tambah / Hapus Favorite
           IconButton(
             tooltip: _isFavorite ? 'Hapus dari Favorite' : 'Tambah ke Favorite',
             icon: Icon(
@@ -144,7 +154,7 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Gambar Banner dengan Exception Handling
+                // [RESPONSI]: Gambar Utama dengan Exception Handling
                 SizedBox(
                   width: double.infinity,
                   height: 240,
@@ -181,7 +191,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Judul Data
+                      // [RESPONSI]: Judul Data
                       Text(
                         widget.item.title,
                         style: const TextStyle(
@@ -192,7 +202,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Author / News Site
+                      // [RESPONSI]: Informasi Author / Kategori
                       Text(
                         widget.item.author,
                         style: const TextStyle(
@@ -202,7 +212,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      // Tanggal Publish
+                      // [RESPONSI]: Tanggal Publikasi
                       Text(
                         _formatDate(widget.item.publishedAt),
                         style: TextStyle(
@@ -213,7 +223,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       const SizedBox(height: 16),
                       const Divider(height: 1),
                       const SizedBox(height: 16),
-                      // Summary / Isi Ringkasan
+                      // [RESPONSI]: Ringkasan / Deskripsi Detail
                       Text(
                         widget.item.summary.isNotEmpty
                             ? widget.item.summary
@@ -231,7 +241,7 @@ class _DetailScreenState extends State<DetailScreen> {
               ],
             ),
           ),
-          // Tombol Buka Situs Resmi (Launch URL) di pojok kanan bawah
+          // [RESPONSI]: Tombol Aksi Buka Situs Resmi (Launch URL)
           Positioned(
             bottom: 20,
             right: 20,

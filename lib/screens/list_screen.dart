@@ -1,3 +1,12 @@
+// =========================================================================
+// [RESPONSI CHECKPOINT 4: HALAMAN LIST & FITUR FILTER]
+// File ini menampilkan daftar item dari API dan Filter Chip horizontal.
+// JIKA STUDI KASUS BERUBAH:
+// 1. Pada _fetchData(): tentukan atribut apa yang dijadikan filter (author, category, clan, brand).
+// 2. Pada FilterChip: sesuaikan logika filter item[field] == selectedFilter.
+// 3. Pada ListView item card: sesuaikan gambar thumbnail (errorBuilder), judul, dan subtitle info.
+// =========================================================================
+
 import 'package:flutter/material.dart';
 import '../models/article_model.dart';
 import '../services/api_service.dart';
@@ -20,8 +29,8 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   List<ArticleModel> _allArticles = [];
-  List<String> _authors = [];
-  String _selectedAuthor = 'All';
+  List<String> _filters = [];
+  String _selectedFilter = 'All';
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -40,16 +49,19 @@ class _ListScreenState extends State<ListScreen> {
 
     try {
       final data = await ApiService.getArticles(widget.endpoint);
-      final Set<String> authorSet = {};
+
+      // [RESPONSI]: Ekstraksi data unik untuk Filter Chip.
+      // Bisa diganti e.category, e.brand, e.clan, dsb sesuai soal baru.
+      final Set<String> filterSet = {};
       for (final item in data) {
         if (item.author.trim().isNotEmpty) {
-          authorSet.add(item.author.trim());
+          filterSet.add(item.author.trim());
         }
       }
 
       setState(() {
         _allArticles = data;
-        _authors = ['All', ...authorSet];
+        _filters = ['All', ...filterSet];
         _isLoading = false;
       });
     } catch (e) {
@@ -62,10 +74,10 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Memfilter data berdasarkan author yang dipilih (Fitur Filter - 20 Poin)
-    final displayedArticles = _selectedAuthor == 'All'
+    // [RESPONSI]: Logika penyaringan data berdasarkan Chip yang aktif
+    final displayedArticles = _selectedFilter == 'All'
         ? _allArticles
-        : _allArticles.where((item) => item.author == _selectedAuthor).toList();
+        : _allArticles.where((item) => item.author == _selectedFilter).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
@@ -81,7 +93,7 @@ class _ListScreenState extends State<ListScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          // Tombol untuk membuka halaman Favourite (Modul 4 & Modul 6)
+          // Tombol menuju halaman Favourite (Modul 4 & Modul 6)
           IconButton(
             tooltip: 'Halaman Favourite',
             icon: const Icon(Icons.favorite, color: Colors.white),
@@ -98,8 +110,8 @@ class _ListScreenState extends State<ListScreen> {
       ),
       body: Column(
         children: [
-          // Baris Filter Chip berdasarkan Author (Fitur Filter - 20 Poin)
-          if (!_isLoading && _authors.isNotEmpty)
+          // [RESPONSI]: Baris Horizontal Filter Chip
+          if (!_isLoading && _filters.isNotEmpty)
             Container(
               color: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -107,15 +119,15 @@ class _ListScreenState extends State<ListScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  children: _authors.map((author) {
-                    final bool isSelected = _selectedAuthor == author;
+                  children: _filters.map((filter) {
+                    final bool isSelected = _selectedFilter == filter;
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: FilterChip(
                         showCheckmark: isSelected,
                         checkmarkColor: const Color(0xFF4C6EF5),
                         selected: isSelected,
-                        label: Text(author),
+                        label: Text(filter),
                         labelStyle: TextStyle(
                           color: isSelected
                               ? const Color(0xFF4C6EF5)
@@ -138,7 +150,7 @@ class _ListScreenState extends State<ListScreen> {
                         ),
                         onSelected: (selected) {
                           setState(() {
-                            _selectedAuthor = author;
+                            _selectedFilter = filter;
                           });
                         },
                       ),
@@ -148,7 +160,8 @@ class _ListScreenState extends State<ListScreen> {
               ),
             ),
           const Divider(height: 1, thickness: 1),
-          // Bagian Daftar Konten (Halaman List - 10 Poin)
+
+          // [RESPONSI]: Tampilan List Data Dinamis (Modul 2 & 5)
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -183,7 +196,7 @@ class _ListScreenState extends State<ListScreen> {
                     : displayedArticles.isEmpty
                         ? Center(
                             child: Text(
-                              'Tidak ada data untuk author "$_selectedAuthor"',
+                              'Tidak ada data untuk filter "$_selectedFilter"',
                               style: const TextStyle(color: Colors.grey),
                             ),
                           )
@@ -219,8 +232,7 @@ class _ListScreenState extends State<ListScreen> {
                                     padding: const EdgeInsets.all(12.0),
                                     child: Row(
                                       children: [
-                                        // Wajib menampilkan gambar sebagai leading (thumbnail)
-                                        // & memberikan exception handling jika gambar tidak muncul
+                                        // [RESPONSI]: Leading Thumbnail & Exception Handling Gambar
                                         ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -252,6 +264,7 @@ class _ListScreenState extends State<ListScreen> {
                                             },
                                             errorBuilder:
                                                 (context, error, stackTrace) {
+                                              // Tampilan fallback jika URL gambar gagal/rusak
                                               return Container(
                                                 width: 85,
                                                 height: 65,
@@ -267,7 +280,7 @@ class _ListScreenState extends State<ListScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 14),
-                                        // Judul & Author Data
+                                        // [RESPONSI]: Judul dan Informasi Tambahan
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
